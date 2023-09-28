@@ -1,9 +1,6 @@
+from no import no
 # o No sempre vai buscar o sucessor ou antecessor de acordo com o ponteiro
-class No:
-    def __init__(self, elemento):
-        self.elemento = elemento
-        self.proximo = None
-        self.anterior = None
+
 
 
 class ListaDuplaEncadeada:
