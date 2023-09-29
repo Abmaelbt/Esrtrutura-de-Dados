@@ -22,3 +22,5 @@ class Pilha:
 
     def size(self):
         return len(self.itens)
+
+valor = input("Digite o elemento: ")

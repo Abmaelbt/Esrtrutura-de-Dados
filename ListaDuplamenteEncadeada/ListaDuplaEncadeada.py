@@ -1,6 +1,4 @@
-from no import no
-# o No sempre vai buscar o sucessor ou antecessor de acordo com o ponteiro
-
+from no import No
 
 
 class ListaDuplaEncadeada:
@@ -11,6 +9,7 @@ class ListaDuplaEncadeada:
 
     def acessar_atual(self):
         # verifica se o atual nao e nulo
+        # se nao for, retorna o atual
         if self.atual is None:
             raise ValueError("Não existe valor no Nó atual")
         else:
@@ -18,11 +17,14 @@ class ListaDuplaEncadeada:
 
     def inserir_antes_do_atual(self, novo):
         novo_no = No(novo)
-        anterior = self.atual.anterior  # armazeno o NO an
+        anterior = self.atual.anterior  # armazeno o NO anterior na variavel
 
+        # o proximo do novo vai ser o atual
+        # o anterior do novo vai ser o anterior do atual
+        # ao final, o atual vai ser o novo NO
         novo_no.anterior = anterior
         novo_no.proximo = self.atual
-        self.atual.anterior = novo_no
+        self.atual.__anterior = novo_no
         if anterior is not None:
             anterior.proximo = novo_no
         else:
@@ -50,6 +52,12 @@ class ListaDuplaEncadeada:
 
     def inserir_como_ultimo(self, novo):
         novo_no = No(novo)
+
+        # novo NO ja comeca como anterior ao ultimo
+        # se o meu ultimo atual nao for Nulo, o proximo a ele sera o novo NO
+        # se for nulo e porque nao existe valor na lista e ele sera o primeiro
+        # ponteiro aponta o NO pro ultimo e atual
+
         novo_no.anterior = self.ultimo
         if self.ultimo is not None:
             self.ultimo.proximo = novo_no
@@ -60,6 +68,12 @@ class ListaDuplaEncadeada:
 
     def inserir_como_primeiro(self, novo):
         novo_no = No(novo)
+
+        # novo NO comeca como proximo ao primeiro
+        # se o meu primeiro atual nao for Nulo, o anterior a ele sera o novo NO
+        # se for nulo e porque nao existe valor na lista apos o primeiro e ele sera o ultimo
+        # ponteiro aponta o NO pro primeiro e atual
+
         novo_no.proximo = self.primeiro
         if self.primeiro is not None:
             self.primeiro.anterior = novo_no
@@ -71,21 +85,30 @@ class ListaDuplaEncadeada:
     def inserir_na_posicao_k(self, k, novo):
 
         if k < 0:
-            return
+            raise IndexError('Indice não pode ser menor que 0')
         # se = 0, significa que será o primeiro da lista
         if k == 0:
             self.inserir_como_primeiro(novo)
             return
 
         novo_no = No(novo)
-        atual = self.primeiro
+        atual = self.primeiro  # move o ponteiro para o inicio da lista
+        # faco a interacao de acordo com K
+        # se o valor atual for None a funcao para
+        # senao, o meu atual vai ser o proximo
         for _ in range(k - 1):
             if atual is None:
                 return
             atual = atual.proximo
 
+        # se apos a iteracao o atual ainda e Nulo, a funcao e interrompida
         if atual is None:
             return
+
+        # anterior ao Novo NO sera o atual
+        # proximo ao Novo NO sera o proximo do atual
+        # se o anterior do atual nao for nulo, o anterior do proximo do atual e o novo NO
+        # se nao for, ele entao sera o ultimo
 
         novo_no.anterior = atual
         novo_no.proximo = atual.proximo
@@ -97,8 +120,14 @@ class ListaDuplaEncadeada:
         self.atual = novo_no
 
     def excluir_atual(self):
+        # se for Nulo, dispara excecao:
         if self.atual is None:
             raise ValueError("Não existe valor no Nó atual")
+
+        # armazena o NO anterior e proximo do atual em duas variaveis
+        # seguir os passos conforme slide:
+        # proximo do anterior sera o proximo e nao mais o atual
+        # anterior do proximo sera o anterior e nao mais o atual
 
         anterior = self.atual.anterior
         proximo = self.atual.proximo
@@ -146,8 +175,14 @@ class ListaDuplaEncadeada:
     def excluir_elemento(self, chave):
         atual = self.primeiro
 
+        # cursor comeca na primeira posicao
+        # enquando o atual nao for nulo:
+        # 1 - verifico se o valor e igual a chave
+        # 1.1 - verifico se o NO atual da iteracao e igual ao NO atual da lista
+        # 1.2 - se for igual, o atual vai apontar para o proximo garantindo que o cursor seja mantido
+        # 2 - exclui o elemento e aponto o cursor para o proximo do meu atual caso haja mais elementos a excluir
         while atual is not None:
-            if atual.valor == chave:
+            if atual.elemento == chave:
                 if self.atual == atual:
                     self.atual = atual.proximo
 
@@ -168,42 +203,48 @@ class ListaDuplaEncadeada:
 
     def excluir_da_pos(self, k):
         if k < 0:
-            raise IndexError("K nao pode ser menor que 0")
-
+            return
+        # se == 0 e o primeiro elemento
         if k == 0:
             self.excluir_primeiro()
 
+        # atual comeca como primeiro
+        # enquanto o atual nao for nulo:
+        # 1 - verifico se a posicao e igual a K
+        # 1.1 - verifico se o atual da iteracao e igual o atual da lista, se igual o atual da iteracao sera o proximo
+        # 2 - armazeno os NOS anterior e atual e variaveis para realizar a exclusao do elemento
+        # 3 - ponteiro aponta pro proximo do meu atual da iteracao
+        # 4 - adiciona 1 na posicao para a verificacao dos elementos se o while nao for correspondido no inicio
         atual = self.primeiro
+        posicao = 0
 
-        anterior = atual.anterior
-        proximo = atual.proximo
+        while atual is not None:
+            if posicao == k:
+                if self.atual == atual:
+                    self.atual = atual.proximo
 
-        for _ in range(k - 1):
-            if atual is None:
-                raise ValueError("Não existe valor no nó atual buscado")
+                anterior = atual.anterior
+                proximo = atual.proximo
+
+                if anterior is not None:
+                    anterior.proximo = proximo
+                else:
+                    self.primeiro = proximo
+
+                if proximo is not None:
+                    proximo.anterior = anterior
+                else:
+                    self.ultimo = anterior
+
+                return
             atual = atual.proximo
-
-        if atual is None:
-            raise ValueError("Não existe valor no índice atual")
-
-        if anterior is not None:
-            anterior.proximo = proximo
-        else:
-            self.primeiro = proximo
-
-        if proximo is not None:
-            proximo.anterior = anterior
-        else:
-            self.ultimo = anterior
-
-        atual = atual.proximo
-        # testar melhor!
+            posicao += 1
 
     def buscar(self, chave):
         atual = self.primeiro
         posicao = 0
         while atual is not None:
-            if atual.elemento == chave:
+            if atual.__elemento == chave:
                 self.atual = atual
                 return True
             else:
@@ -226,3 +267,10 @@ class ListaDuplaEncadeada:
 
     def ir_para_ultimo(self):
         self.atual = self.ultimo
+
+    def imprimir_lista(self):
+        atual = self.primeiro
+        while atual is not None:
+            print(atual.elemento, end=" ")
+            atual = atual.proximo
+        print()
